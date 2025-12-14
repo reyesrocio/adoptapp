@@ -83,10 +83,23 @@
             }));
 
             // (Opcional) Marcar como no disponible inmediatamente
-            mascota.disponible = false;
-            saveMascotasDB(db);
+            function adoptarMascota(id) {
+                const db = getMascotasDB();
+                const mascota = db.find(m => m.id === id);
+                if (!mascota) return;
 
-            window.location.href = 'index.html';
+            // Guardar selección para el formulario
+            localStorage.setItem('mascotaSeleccionadaForm', JSON.stringify({
+                id: mascota.id,
+                nombre: mascota.nombre,
+                tipo: mascota.tipo,
+                raza: mascota.raza,
+                edad: mascota.edad,
+                tamano: mascota.tamano,
+                sexo: mascota.sexo
+            }));
+
+            window.location.href = '03-formulario_adopcion.html';
         }
 
         function renderMascotas() {
@@ -130,3 +143,4 @@
 </body>
 
 </html>
+
