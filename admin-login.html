@@ -49,19 +49,9 @@
 
   <div id="error" class="error"></div>
 </div>
-
 <script>
-  function login() {
-    const pass = document.getElementById("password").value;
-
-    // CONTRASEÑA CORRECTA
-    if (pass === "1234") {
-      localStorage.setItem("adminLogueado", "true");
-      window.location.href = "admin-panel.html";
-    } else {
-      document.getElementById("error").innerText = "❌ Contraseña incorrecta";
-    }
-  }
+  localStorage.setItem("adminLogueado", "true");
+  window.location.href = "admin-panel.html";
 </script>
 
 </body>
