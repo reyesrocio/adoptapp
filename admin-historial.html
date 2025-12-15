@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Historial de Adopciones</title>
+<style>
+body { font-family: Arial; background:#f4f6fa; padding:20px; }
+.card {
+    background:#fff;
+    padding:15px;
+    margin:10px 0;
+    border-left:6px solid #4CAF50;
+}
+</style>
+</head>
+<body>
+
+<h1>📜 Historial de Adopciones</h1>
+<a href="admin-panel.html">⬅ Volver al Panel</a>
+
+<div id="historial"></div>
+
+<script>
+const solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
+const historial = document.getElementById("historial");
+
+const aprobadas = solicitudes.filter(s => s.estado === "aprobada");
+
+if (aprobadas.length === 0) {
+    historial.innerHTML = "<p>No hay adopciones registradas.</p>";
+}
+
+aprobadas.forEach(s => {
+    historial.innerHTML += `
+    <div class="card">
+        🐾 Mascota: <b>${s.mascota}</b><br>
+        👤 Adoptante: ${s.adoptante}<br>
+        📞 Teléfono: ${s.telefono}<br>
+        📅 Fecha: ${s.fecha}
+    </div>`;
+});
+</script>
+
+</body>
+</html>
