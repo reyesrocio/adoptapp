@@ -1,0 +1,47 @@
+<h1>📦 Solicitudes</h1>
+<div id="lista"></div>
+
+<script>
+const solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
+const lista = document.getElementById("lista");
+
+function guardarCambios() {
+    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
+}
+
+function aprobar(id) {
+    const s = solicitudes.find(s => s.id === id);
+    s.estado = "aprobada";
+
+    let mascotas = JSON.parse(localStorage.getItem("mascotasDB"));
+    const m = mascotas.find(m => m.nombre === s.mascota);
+    if (m) m.disponible = false;
+
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    guardarCambios();
+    location.reload();
+}
+
+function rechazar(id) {
+    const s = solicitudes.find(s => s.id === id);
+    s.estado = "rechazada";
+    guardarCambios();
+    location.reload();
+}
+
+solicitudes.forEach(s => {
+    lista.innerHTML += `
+    <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        🐾 <b>${s.mascota}</b><br>
+        👤 ${s.adoptante}<br>
+        📞 ${s.telefono}<br>
+        📅 ${s.fecha}<br>
+        📌 Estado: <b>${s.estado}</b><br><br>
+
+        ${s.estado === "pendiente" ? `
+            <button onclick="aprobar(${s.id})">✅ Aprobar</button>
+            <button onclick="rechazar(${s.id})">❌ Rechazar</button>
+        ` : ""}
+    </div>`;
+});
+</script>
