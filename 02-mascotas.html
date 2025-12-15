@@ -35,7 +35,7 @@
     
     <div class="header-buttons">
         <a href="index.html" class="header-btn btn-formulario">📋 Volver al Formulario de Adopción</a>
-        <a href="04-adopciones_exito.html" class="header-btn btn-formulario" style="background: linear-gradient(90deg, #8a2be2, #4a6fa5);">🏆 Adopciones Exitosas</a>
+        <a href="adopciones_exito.html" class="header-btn btn-formulario" style="background: linear-gradient(90deg, #8a2be2, #4a6fa5);">🏆 Adopciones Exitosas</a>
     </div>
 
     <div id="mascotas-grid" class="mascotas-grid"></div>
@@ -83,23 +83,10 @@
             }));
 
             // (Opcional) Marcar como no disponible inmediatamente
-            function adoptarMascota(id) {
-                const db = getMascotasDB();
-                const mascota = db.find(m => m.id === id);
-                if (!mascota) return;
+            mascota.disponible = false;
+            saveMascotasDB(db);
 
-            // Guardar selección para el formulario
-            localStorage.setItem('mascotaSeleccionadaForm', JSON.stringify({
-                id: mascota.id,
-                nombre: mascota.nombre,
-                tipo: mascota.tipo,
-                raza: mascota.raza,
-                edad: mascota.edad,
-                tamano: mascota.tamano,
-                sexo: mascota.sexo
-            }));
-
-            window.location.href = '03-formulario_adopcion.html';
+            window.location.href = 'index.html';
         }
 
         function renderMascotas() {
@@ -141,6 +128,4 @@
         document.addEventListener('DOMContentLoaded', renderMascotas);
     </script>
 </body>
-
 </html>
-
