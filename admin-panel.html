@@ -1,210 +1,30 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Admin Panel - ADOPTAPP</title>
-<style>
-body {
-    font-family: Poppins, sans-serif;
-    background: #f4f6fb;
-    padding: 30px;
-}
-h1 { text-align: center; color: #4a6fa5; }
-.container {
-    max-width: 900px;
-    margin: auto;
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-}
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 8px;
-    margin-bottom: 15px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-button {
-    background: #4CAF50;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-button:hover { opacity: 0.9; }
-.mascota {
-    border-bottom: 1px solid #ddd;
-    padding: 10px 0;
-}
-.delete-btn {
-    background: #e53935;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Panel Admin | ADOPTAPP</title>
 </head>
-
-
-<button onclick="logoutAdmin()" style="float:right;">
-    🚪 Cerrar sesión
-</button>
-
-
 <body>
 
-<h1>🐶 Panel de Administración - ADOPTAPP</h1>
+<script>
+    if (localStorage.getItem("adminLogueado") !== "true") {
+        window.location.href = "admin.html";
+    }
+</script>
 
-<div class="container">
+<h1>Panel Administrador</h1>
+<p>Bienvenida, administradora 👑</p>
 
-<h3>➕ Registrar nueva mascota</h3>
+<a href="02-mascotas.html">🐶 Gestionar Mascotas</a><br><br>
+<a href="04-adopciones_exito.html">📦 Ver Adopciones</a><br><br>
 
-<input id="nombre" placeholder="Nombre">
-<select id="tipo">
-    <option>Perro</option>
-    <option>Gato</option>
-</select>
-<input id="raza" placeholder="Raza">
-<input id="edad" type="number" placeholder="Edad">
-<select id="tamano">
-    <option>Pequeño</option>
-    <option>Mediano</option>
-    <option>Grande</option>
-</select>
-<select id="sexo">
-    <option>Macho</option>
-    <option>Hembra</option>
-</select>
-<input id="imagen" placeholder="URL de imagen">
-
-<button onclick="agregarMascota()">Agregar Mascota</button>
-
-<hr>
-
-<h3>📋 Mascotas Registradas</h3>
-<div id="lista-mascotas"></div>
-
-</div>
+<button onclick="logout()">🚪 Cerrar sesión</button>
 
 <script>
-
-
-/* 🔐 Protección del panel admin */
-if (localStorage.getItem("adminLogueado") !== "true") {
-    window.location.href = "../index.html";
-}
-
-function logoutAdmin() {
+function logout() {
     localStorage.removeItem("adminLogueado");
-    window.location.href = "admin-login.html";
+    window.location.href = "index.html";
 }
-
-function getMascotasDB() {
-    return JSON.parse(localStorage.getItem('mascotasDB')) || [];
-}
-
-function saveMascotasDB(db) {
-    localStorage.setItem('mascotasDB', JSON.stringify(db));
-}
-
-
-function editarMascota(id) {
-    const db = getMascotasDB();
-    const mascota = db.find(m => m.id === id);
-
-    if (!mascota) return;
-
-    // Ejemplo: enviar datos al formulario
-    localStorage.setItem("mascotaEditando", JSON.stringify(mascota));
-    window.location.href = "formulario_mascota.html";
-}
-
-
-function agregarMascota() {
-    function agregarMascota() {
-    const db = getMascotasDB();
-
-    if (mascotaEditandoId) {
-        // EDITAR
-        const mascota = db.find(m => m.id === mascotaEditandoId);
-        mascota.nombre = nombre.value;
-        mascota.tipo = tipo.value;
-        mascota.raza = raza.value;
-        mascota.edad = edad.value;
-        mascota.tamano = tamano.value;
-        mascota.sexo = sexo.value;
-        mascota.url_imagen = imagen.value;
-
-        mascotaEditandoId = null;
-        alert("Mascota editada ✏️");
-    } else {
-        // CREAR
-        db.push({
-            id: Date.now(),
-            nombre: nombre.value,
-            tipo: tipo.value,
-            raza: raza.value,
-            edad: edad.value,
-            tamano: tamano.value,
-            sexo: sexo.value,
-            url_imagen: imagen.value,
-            disponible: true
-        });
-        alert("Mascota agregada 🐾");
-    }
-
-    saveMascotasDB(db);
-    listarMascotas();
-}
-}
-
-function eliminarMascota(id) {
-    let db = getMascotasDB();
-    db = db.filter(m => m.id !== id);
-    saveMascotasDB(db);
-    listarMascotas();
-}
-
-function editarMascota(id) {
-    const db = getMascotasDB();
-    const m = db.find(m => m.id === id);
-
-    nombre.value = m.nombre;
-    tipo.value = m.tipo;
-    raza.value = m.raza;
-    edad.value = m.edad;
-    tamano.value = m.tamano;
-    sexo.value = m.sexo;
-    imagen.value = m.url_imagen;
-
-    mascotaEditandoId = id;
-}
-
-function listarMascotas() {
-    const db = getMascotasDB();
-    const cont = document.getElementById('lista-mascotas');
-    cont.innerHTML = "";
-
-    if (db.length === 0) {
-        cont.innerHTML = "<p>No hay mascotas registradas.</p>";
-        return;
-    }
-
-    db.forEach(m => {
-        cont.innerHTML += `
-        <div class="mascota">
-            <strong>${m.nombre}</strong> - ${m.tipo} (${m.edad} años)
-
-            <button onclick="editarMascota(${m.id})">
-                ✏️ Editar
-            </button>
-
-            <button class="delete-btn" onclick="eliminarMascota(${m.id})">
-                ❌ Eliminar
-            </button>
-        </div>`;
-    });
-}
-
-document.addEventListener("DOMContentLoaded", listarMascotas);
-
 </script>
 
 </body>
