@@ -1,66 +1,34 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Login Administrador - ADOPTAPP</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f0f4ff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .login-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,.2);
-      width: 300px;
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-    }
-    button {
-      padding: 10px;
-      width: 100%;
-      background: #4a6fa5;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Login Admin</title>
 </head>
 <body>
 
-  <div class="login-box">
-    <h2>🔐 Admin ADOPTAPP</h2>
+<h2>LOGIN ADMIN</h2>
 
-    <input type="text" id="usuario" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
+<input id="user" placeholder="usuario"><br><br>
+<input id="pass" type="password" placeholder="contraseña"><br><br>
 
-    <!-- 👇 ESTE BOTÓN ES CLAVE -->
-    <button onclick="login()">Ingresar</button>
-  </div>
+<button onclick="login()">ENTRAR</button>
 
-  <script>
-    function login() {
-      const user = document.getElementById("usuario").value;
-      const pass = document.getElementById("password").value;
+<script>
+function login() {
+  const u = document.getElementById("user").value;
+  const p = document.getElementById("pass").value;
 
-      if (user === "admin" && pass === "1234") {
-        localStorage.setItem("adminLogueado", "true");
-        window.location.href = "admin-panel.html";
-      } else {
-        alert("❌ Usuario o contraseña incorrectos");
-      }
-    }
-  </script>
+  alert("Usuario: " + u + " | Pass: " + p);
+
+  if (u === "admin" && p === "1234") {
+    localStorage.setItem("adminLogueado", "true");
+    alert("LOGIN OK");
+    window.location.href = "admin-panel.html";
+  } else {
+    alert("LOGIN MAL");
+  }
+}
+</script>
 
 </body>
 </html>
