@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Admin Mascotas</title>
+</head>
+<body>
+
+<h2>🐾 Gestión de Mascotas</h2>
+
+<input id="nombre" placeholder="Nombre">
+<input id="tipo" placeholder="Tipo">
+<input id="raza" placeholder="Raza">
+<button onclick="agregar()">Agregar</button>
+
+<ul id="lista"></ul>
+
+<script>
+if (localStorage.getItem("adminLogueado") !== "true") {
+  window.location.href = "admin-login.html";
+}
+
+let db = JSON.parse(localStorage.getItem("mascotasDB") || "[]");
+
+function guardar() {
+  localStorage.setItem("mascotasDB", JSON.stringify(db));
+  render();
+}
+
+function agregar() {
+  db.push({
+    id: Date.now(),
+    nombre: nombre.value,
+    tipo: tipo.value,
+    raza: raza.value,
+    disponible: true
+  });
+  guardar();
+}
+
+function eliminar(id) {
+  db = db.filter(m => m.id !== id);
+  guardar();
+}
+
+function render() {
+  lista.innerHTML = "";
+  db.forEach(m => {
+    lista.innerHTML += `
+      <li>
+        ${m.nombre} (${m.tipo})
+        <button onclick="eliminar(${m.id})">❌</button>
+      </li>`;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
