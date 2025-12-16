@@ -1,9 +1,70 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Panel Admin | ADOPTAPP</title>
+<meta charset="UTF-8">
+<title>Panel Admin | ADOPTAPP</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #f4f6fb;
+    padding: 30px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.menu {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.menu a, .menu button {
+    display: inline-block;
+    margin: 10px;
+    padding: 12px 20px;
+    border-radius: 25px;
+    border: none;
+    text-decoration: none;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+}
+
+.mascotas { background: #2196F3; }
+.logout { background: #f44336; }
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    margin-bottom: 15px;
+}
+
+.btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+.aprobar { background: #4CAF50; }
+.rechazar { background: #ff5252; }
+
+.estado {
+    font-weight: bold;
+}
+</style>
 </head>
+
 <body>
 
 <script>
@@ -12,19 +73,79 @@ if (localStorage.getItem("adminLogueado") !== "true") {
 }
 </script>
 
-<h1>Panel Administrador</h1>
-<p>Bienvenida, administradora 👑</p>
+<h1>👑 Panel Administrador</h1>
+<p style="text-align:center;">Gestión de solicitudes de adopción</p>
 
-<a href="admin-mascotas.html">🐶 Gestionar Mascotas</a>
-<a href="04-adopciones_exito.html">📦 Ver Adopciones</a><br><br>
+<div class="menu">
+    <a href="admin-mascotas.html" class="mascotas">🐶 Gestionar Mascotas</a>
+    <button class="logout" onclick="logout()">🚪 Cerrar sesión</button>
+</div>
 
-<button onclick="logout()">🚪 Cerrar sesión</button>
+<h2>📋 Solicitudes Pendientes</h2>
+
+<div id="listaSolicitudes"></div>
 
 <script>
 function logout() {
     localStorage.removeItem("adminLogueado");
     window.location.href = "index.html";
 }
+
+let solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
+let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+
+const contenedor = document.getElementById("listaSolicitudes");
+
+function renderSolicitudes() {
+    contenedor.innerHTML = "";
+
+    if (solicitudes.length === 0) {
+        contenedor.innerHTML = "<p>No hay solicitudes registradas.</p>";
+        return;
+    }
+
+    solicitudes.forEach((s, index) => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <p><strong>Mascota:</strong> ${s.mascotaNombre}</p>
+            <p><strong>Adoptante:</strong> ${s.adoptante}</p>
+            <p><strong>Teléfono:</strong> ${s.telefono}</p>
+            <p class="estado">Estado: ${s.estado}</p>
+            ${
+                s.estado === "pendiente"
+                ? `<button class="btn aprobar" onclick="aprobar(${index})">Aceptar</button>
+                   <button class="btn rechazar" onclick="rechazar(${index})">Rechazar</button>`
+                : ""
+            }
+        `;
+
+        contenedor.appendChild(div);
+    });
+}
+
+function aprobar(i) {
+    const solicitud = solicitudes[i];
+
+    const idxMascota = mascotas.findIndex(m => m.id === solicitud.mascotaId);
+    if (idxMascota !== -1) {
+        mascotas[idxMascota].disponible = false;
+        localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    }
+
+    solicitudes[i].estado = "aprobada";
+    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
+    renderSolicitudes();
+}
+
+function rechazar(i) {
+    solicitudes[i].estado = "rechazada";
+    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
+    renderSolicitudes();
+}
+
+renderSolicitudes();
 </script>
 
 </body>
