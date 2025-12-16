@@ -1,6 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<!-- Firebase SDKs -->
+<script type="module">
+  // Importa funciones de Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, ref, set, push, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  // Configuración de Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAXP2jqSlxlgaZJR1EyDAJ7DcOxUIdZDrA",
+    authDomain: "adoptapp-b18a9.firebaseapp.com",
+    projectId: "adoptapp-b18a9",
+    storageBucket: "adoptapp-b18a9.firebasestorage.app",
+    messagingSenderId: "137872497714",
+    appId: "1:137872497714:web:00b7b3ea5b863ae6f6b02b",
+    measurementId: "G-WM6T47K2BD"
+  };
+
+  // Inicializar Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  // Lo exponemos para tus scripts
+  window.database = database;
+  window.firebaseRefs = { mascotas: ref(database, 'mascotas'), solicitudes: ref(database, 'solicitudes') };
+</script>
+    
 <meta charset="UTF-8">
 <title>Admin | Gestión de Mascotas</title>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
