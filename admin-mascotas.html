@@ -2,172 +2,80 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Admin - Gestión de Mascotas</title>
-
+<title>Gestionar Mascotas</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f4f6fb;
-    padding: 30px;
+body { font-family: Arial; background:#f4f6fa; padding:20px; }
+.container { background:#fff; padding:20px; border-radius:10px; max-width:600px; margin:auto; }
+input, textarea, select, button {
+  width:100%; padding:10px; margin:8px 0;
 }
-
-h2 {
-    text-align: center;
-    color: #4a6fa5;
-}
-
-.container {
-    max-width: 700px;
-    margin: auto;
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-}
-
-input, textarea {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-}
-
 button {
-    padding: 10px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
+  background:#4CAF50; color:white; border:none; cursor:pointer;
 }
-
-.btn-add {
-    background: #4CAF50;
-    color: white;
-    width: 100%;
-    margin-top: 10px;
-}
-
-.btn-delete {
-    background: #e74c3c;
-    color: white;
-    margin-left: 10px;
-}
-
 .card {
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 8px;
-    margin-top: 10px;
+  background:#f9f9f9; padding:10px; margin-top:10px; border-left:5px solid #4CAF50;
 }
 </style>
 </head>
-
 <body>
 
-<script>
-/* 🔐 Seguridad: solo admin */
-if (localStorage.getItem("adminLogueado") !== "true") {
-    window.location.href = "admin-login.html";
-}
-</script>
-
 <div class="container">
-<h2>🐾 Gestión de Mascotas</h2>
+<h2>🐾 Agregar Mascota</h2>
 
-<!-- FORMULARIO -->
-<input id="nombre" placeholder="Nombre de la mascota">
-<input id="tipo" placeholder="Tipo (Perro / Gato)">
+<input id="nombre" placeholder="Nombre">
+<select id="tipo">
+  <option>Perro</option>
+  <option>Gato</option>
+</select>
 <input id="raza" placeholder="Raza">
 <input id="edad" type="number" placeholder="Edad">
 <input id="tamano" placeholder="Tamaño">
 <input id="sexo" placeholder="Sexo">
-<input id="url_imagen" placeholder="URL de imagen (opcional)">
-<textarea id="descripcion" placeholder="Descripción"></textarea>
+<input id="img" placeholder="URL de imagen">
+<textarea id="desc" placeholder="Descripción"></textarea>
 
-<button class="btn-add" onclick="agregar()">➕ Agregar Mascota</button>
+<button onclick="agregar()">➕ Agregar Mascota</button>
 
-<hr>
-
-<!-- LISTA -->
+<h3>📋 Mascotas registradas</h3>
 <div id="lista"></div>
 
-<button onclick="cerrarSesion()" style="margin-top:20px; background:#555; color:white;">
-Cerrar sesión
-</button>
+<a href="admin-panel.html">⬅ Volver</a>
 </div>
 
 <script>
-let db = JSON.parse(localStorage.getItem("mascotasDB")) || [];
-
-function guardar() {
-    localStorage.setItem("mascotasDB", JSON.stringify(db));
-    render();
-}
+let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
 
 function agregar() {
-    if (!nombre.value || !tipo.value) {
-        alert("Completa al menos nombre y tipo");
-        return;
-    }
+  const mascota = {
+    id: Date.now(),
+    nombre: nombre.value,
+    tipo: tipo.value,
+    raza: raza.value,
+    edad: edad.value,
+    tamano: tamano.value,
+    sexo: sexo.value,
+    descripcion: desc.value,
+    disponible: true,
+    url_imagen: img.value
+  };
 
-    db.push({
-        id: Date.now(),
-        nombre: nombre.value,
-        tipo: tipo.value,
-        raza: raza.value,
-        edad: edad.value,
-        tamano: tamano.value,
-        sexo: sexo.value,
-        descripcion: descripcion.value,
-        url_imagen: url_imagen.value,
-        disponible: true
-    });
-
-    limpiar();
-    guardar();
+  mascotas.push(mascota);
+  localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+  mostrar();
+  alert("✅ Mascota agregada");
 }
 
-function eliminar(id) {
-    if (confirm("¿Eliminar mascota?")) {
-        db = db.filter(m => m.id !== id);
-        guardar();
-    }
+function mostrar() {
+  lista.innerHTML = "";
+  mascotas.forEach(m => {
+    lista.innerHTML += `
+      <div class="card">
+        🐾 <b>${m.nombre}</b> (${m.tipo}) - ${m.raza}
+      </div>`;
+  });
 }
 
-function limpiar() {
-    nombre.value = "";
-    tipo.value = "";
-    raza.value = "";
-    edad.value = "";
-    tamano.value = "";
-    sexo.value = "";
-    descripcion.value = "";
-    url_imagen.value = "";
-}
-
-function render() {
-    lista.innerHTML = "";
-
-    if (db.length === 0) {
-        lista.innerHTML = "<p>No hay mascotas registradas.</p>";
-        return;
-    }
-
-    db.forEach(m => {
-        lista.innerHTML += `
-        <div class="card">
-            <b>${m.nombre}</b> - ${m.tipo}<br>
-            Raza: ${m.raza || "Mestizo"}<br>
-            Edad: ${m.edad || "-"}<br>
-            <button class="btn-delete" onclick="eliminar(${m.id})">❌ Eliminar</button>
-        </div>
-        `;
-    });
-}
-
-function cerrarSesion() {
-    localStorage.removeItem("adminLogueado");
-    window.location.href = "admin-login.html";
-}
-
-render();
+mostrar();
 </script>
 
 </body>
