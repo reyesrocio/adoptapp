@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mascotas Disponibles | ADOPTAPP</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background-color: #f9f9f9; }
+        h1 { text-align: center; }
+        .mascota { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; width: 200px; text-align: center; background-color: #fff; border-radius: 8px; }
+        .mascota h3 { margin: 5px 0; }
+    </style>
+</head>
+<body>
+
+<h1>Mascotas Disponibles para Adopción</h1>
+<div id="listaMascotas"></div>
+
+<script>
+    const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+    const listaDiv = document.getElementById("listaMascotas");
+
+    if (mascotas.length === 0) {
+        listaDiv.innerHTML = "<p>No hay mascotas disponibles por ahora.</p>";
+    } else {
+        mascotas.forEach(m => {
+            const div = document.createElement("div");
+            div.classList.add("mascota");
+            div.innerHTML = `
+                <h3>${m.nombre}</h3>
+                <p>Tipo: ${m.tipo}</p>
+                <p>Edad: ${m.edad}</p>
+            `;
+            listaDiv.appendChild(div);
+        });
+    }
+</script>
+
+</body>
+</html>
