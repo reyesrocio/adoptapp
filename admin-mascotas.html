@@ -22,27 +22,45 @@ h1 {
     padding: 20px;
     border-radius: 15px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .estado {
     font-weight: bold;
-    margin-top: 8px;
 }
 
-.disponible {
-    color: #4CAF50;
+.disponible { color: #4CAF50; }
+.adoptado { color: #f44336; }
+
+.acciones {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
 }
 
-.adoptado {
-    color: #f44336;
+button {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.editar {
+    background: #2196F3;
+    color: white;
+}
+
+.eliminar {
+    background: #f44336;
+    color: white;
 }
 
 .volver {
     display: inline-block;
     margin-bottom: 20px;
     text-decoration: none;
-    background: #2196F3;
+    background: #673AB7;
     color: white;
     padding: 10px 18px;
     border-radius: 25px;
@@ -61,34 +79,83 @@ if (localStorage.getItem("adminLogueado") !== "true") {
 
 <a href="admin-panel.html" class="volver">⬅ Volver al Panel</a>
 
-<h1>🐾 Mascotas Registradas</h1>
+<h1>🐾 Gestión de Mascotas</h1>
 
 <div id="listaMascotas"></div>
 
 <script>
 const contenedor = document.getElementById("listaMascotas");
-const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
 
-if (mascotas.length === 0) {
-    contenedor.innerHTML = "<p>No hay mascotas registradas.</p>";
+function cargarMascotas() {
+    contenedor.innerHTML = "";
+    const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+
+    if (mascotas.length === 0) {
+        contenedor.innerHTML = "<p>No hay mascotas registradas.</p>";
+        return;
+    }
+
+    mascotas.forEach(m => {
+        const div = document.createElement("div");
+        div.className = "card";
+
+        div.innerHTML = `
+            <h3>${m.nombre}</h3>
+            <p><b>Tipo:</b> ${m.tipo}</p>
+            <p><b>Raza:</b> ${m.raza || "Mestizo"}</p>
+            <p><b>Edad:</b> ${m.edad}</p>
+            <p class="estado ${m.disponible ? 'disponible' : 'adoptado'}">
+                ${m.disponible ? "🟢 Disponible" : "🔴 Adoptado"}
+            </p>
+
+            ${
+                m.disponible
+                ? `
+                <div class="acciones">
+                    <button class="editar" onclick="editarMascota(${m.id})">✏️ Editar</button>
+                    <button class="eliminar" onclick="eliminarMascota(${m.id})">🗑 Eliminar</button>
+                </div>
+                `
+                : `<p><i>No se puede modificar una mascota adoptada</i></p>`
+            }
+        `;
+
+        contenedor.appendChild(div);
+    });
 }
 
-mascotas.forEach(m => {
-    const div = document.createElement("div");
-    div.className = "card";
+function editarMascota(id) {
+    const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+    const mascota = mascotas.find(m => m.id === id);
 
-    div.innerHTML = `
-        <h3>${m.nombre}</h3>
-        <p><b>Tipo:</b> ${m.tipo}</p>
-        <p><b>Raza:</b> ${m.raza || "Mestizo"}</p>
-        <p><b>Edad:</b> ${m.edad}</p>
-        <p class="estado ${m.disponible ? 'disponible' : 'adoptado'}">
-            ${m.disponible ? "🟢 Disponible" : "🔴 Adoptado"}
-        </p>
-    `;
+    if (!mascota) return;
 
-    contenedor.appendChild(div);
-});
+    const nuevoNombre = prompt("Nuevo nombre:", mascota.nombre);
+    if (!nuevoNombre) return;
+
+    const nuevaEdad = prompt("Nueva edad:", mascota.edad);
+    if (!nuevaEdad) return;
+
+    mascota.nombre = nuevoNombre;
+    mascota.edad = nuevaEdad;
+
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    alert("Mascota actualizada correctamente ✅");
+    cargarMascotas();
+}
+
+function eliminarMascota(id) {
+    if (!confirm("⚠️ ¿Seguro que deseas eliminar esta mascota?")) return;
+
+    let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+    mascotas = mascotas.filter(m => m.id !== id);
+
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    alert("Mascota eliminada correctamente 🗑");
+    cargarMascotas();
+}
+
+cargarMascotas();
 </script>
 
 </body>
