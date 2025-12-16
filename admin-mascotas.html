@@ -168,24 +168,33 @@ function guardar() {
   }
 
   const mascota = {
+    id: editId || Date.now(),  // Genera un ID único
     nombre: nombre.value,
     tipo: tipo.value,
     raza: raza.value,
     edad: edad.value,
     sexo: sexo.value,
     descripcion: descripcion.value,
-    imagen: imagen.value,
+    imagen: imagen.value || "https://via.placeholder.com/120", // Placeholder si no hay URL
     disponible: true
   };
 
-  const id = editId || Date.now();
-  set(ref(database, 'mascotas/' + id), mascota)
-    .then(() => {
-      alert("Mascota guardada ✅");
-      limpiar();
-      editId = null;
-      render(); // actualizar pantalla
-    })
+  if(editId) {
+    // Editar mascota existente
+    const index = mascotas.findIndex(m => m.id === editId);
+    if(index !== -1) mascotas[index] = mascota;
+  } else {
+    // Agregar nueva mascota
+    mascotas.push(mascota);
+  }
+
+  localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+  alert("Mascota guardada ✅");
+  limpiar();
+  editId = null;
+  render(); // actualizar pantalla
+}
+
     .catch(err => alert("Error: " + err));
 }
 
