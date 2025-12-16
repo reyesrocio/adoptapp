@@ -1,162 +1,62 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Formulario de Adopción - ADOPTAPP</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-<style>
-body {
-    font-family: 'Poppins', sans-serif;
-    background: linear-gradient(135deg, #f0f8ff, #e6e6fa);
-    padding: 20px;
-}
-.form-container {
-    max-width: 700px;
-    margin: auto;
-    background: white;
-    padding: 40px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,.15);
-}
-h2 {
-    color: #1e3a8a;
-    border-bottom: 2px solid #d1e5f4;
-}
-label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 500;
-}
-input, select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #c1d5e0;
-}
-input[readonly] {
-    background: #f7faff;
-    font-weight: 600;
-}
-button {
-    margin-top: 25px;
-    padding: 14px;
-    border-radius: 30px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-}
-.btn-submit {
-    background: linear-gradient(90deg, #8a2be2, #4a6fa5);
-    color: white;
-}
-.btn-back {
-    background: #2196F3;
-    color: white;
-}
-.badges {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-.badge {
-    background: #e6e6fa;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: .9rem;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Formulario de Adopción | ADOPTAPP</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        h1 { text-align: center; color: #333; }
+        form { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 10px; }
+        input, button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #4a6fa5; color: white; border: none; cursor: pointer; margin-top: 15px; }
+        button:hover { background-color: #3b5480; }
+    </style>
 </head>
-
 <body>
+    <h1>Formulario de Adopción</h1>
+    <form id="formAdopcion">
+        <label>Nombre completo:</label>
+        <input type="text" name="nombre" required>
 
-<div class="form-container">
-<form id="formAdopcion">
+        <label>DNI:</label>
+        <input type="text" name="dni" required>
 
-<h2>Datos del Adoptante</h2>
-<label>Nombre</label>
-<input id="nombre" required>
+        <label>Teléfono:</label>
+        <input type="tel" name="telefono" required>
 
-<label>DNI</label>
-<input id="dni" required>
+        <label>Correo/Gmail:</label>
+        <input type="email" name="correo" required>
 
-<label>Teléfono</label>
-<input id="telefono" required>
+        <button type="submit">Enviar Solicitud</button>
+    </form>
 
-<label>Email</label>
-<input id="email" type="email" required>
+    <script>
+        // Obtener ID de mascota desde URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const idMascota = parseInt(urlParams.get('id'));
 
-<h2>Mascota Seleccionada</h2>
-<label>Nombre</label>
-<input id="mascota_nombre" readonly>
+        document.getElementById('formAdopcion').addEventListener('submit', function(e){
+            e.preventDefault();
+            const form = e.target;
 
-<div class="badges" id="badges"></div>
+            const solicitud = {
+                mascotaId: idMascota,
+                nombre: form.nombre.value,
+                dni: form.dni.value,
+                telefono: form.telefono.value,
+                correo: form.correo.value,
+                fecha: new Date().toLocaleDateString()
+            };
 
-<button type="button" class="btn-back" onclick="location.href='02-mascotas.html'">
-← Volver a Mascotas
-</button>
+            const solicitudes = JSON.parse(localStorage.getItem('solicitudesDB')) || [];
+            solicitudes.push(solicitud);
+            localStorage.setItem('solicitudesDB', JSON.stringify(solicitudes));
 
-<button type="submit" class="btn-submit">
-Enviar Solicitud
-</button>
-
-</form>
-</div>
-
-<script>
-let mascota = null;
-
-// 🔹 Cargar mascota seleccionada
-document.addEventListener("DOMContentLoaded", () => {
-    mascota = JSON.parse(localStorage.getItem("mascotaSeleccionada"));
-
-    if (!mascota) {
-        alert("Debes seleccionar una mascota");
-        location.href = "02-mascotas.html";
-        return;
-    }
-
-    document.getElementById("mascota_nombre").value = mascota.nombre;
-
-    const badges = document.getElementById("badges");
-    badges.innerHTML = "";
-
-    ["tipo","raza","edad","sexo","tamano"].forEach(c => {
-        if (mascota[c]) {
-            const b = document.createElement("span");
-            b.className = "badge";
-            b.textContent = `${c}: ${mascota[c]}`;
-            badges.appendChild(b);
-        }
-    });
-});
-
-// 🔹 Enviar solicitud (NO elimina mascota)
-document.getElementById("formAdopcion").addEventListener("submit", e => {
-    e.preventDefault();
-
-    let solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
-
-    solicitudes.push({
-        id: Date.now(),
-        mascotaId: mascota.id,
-        mascotaNombre: mascota.nombre,
-        adoptante: document.getElementById("nombre").value,
-        telefono: document.getElementById("telefono").value,
-        email: document.getElementById("email").value,
-        fecha: new Date().toLocaleString(),
-        estado: "pendiente"
-    });
-
-    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
-
-    alert("✅ Solicitud enviada. El administrador la revisará.");
-
-    localStorage.removeItem("mascotaSeleccionadaForm");
-    location.href = "05-gracias_adopcion.html";
-});
-</script>
-
+            alert('¡Solicitud enviada con éxito!');
+            form.reset();
+            window.location.href = 'mascotas-usuarios.html'; // Regresa a la lista de mascotas
+        });
+    </script>
 </body>
 </html>
-
