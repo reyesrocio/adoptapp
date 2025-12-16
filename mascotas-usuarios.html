@@ -37,8 +37,8 @@
     <div id="lista-mascotas"></div>
 
     <script>
-        // Mascotas ejemplo
-        const mascotas = [
+        // Mascotas ejemplo, se puede reemplazar con localStorage
+        const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [
             {
                 id: 1,
                 nombre: "Gato Manul",
