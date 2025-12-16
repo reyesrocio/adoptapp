@@ -96,17 +96,19 @@
         }
 
         function adoptarMascota(id) {
-            const db = getMascotasDB();
-            const mascota = db.find(m => m.id === id);
+            const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+            const mascota = mascotas.find(m => m.id === id);
+
             if (!mascota) return;
 
-            localStorage.setItem("mascotaSeleccionadaForm", JSON.stringify(mascota));
+            localStorage.setItem(
+                "mascotaSeleccionada",
+                JSON.stringify(mascota)
+            );
 
-            mascota.disponible = false;
-            localStorage.setItem("mascotasDB", JSON.stringify(db));
-
-            window.location.href = "index.html";
+        window.location.href = "form-adopcion.html";
         }
+
 
         function renderMascotas() {
             const mascotas = getMascotasDB();
@@ -150,3 +152,4 @@
 
 </body>
 </html>
+
