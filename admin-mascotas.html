@@ -3,46 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <title>Admin | Gestión de Mascotas</title>
-
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body {
-  font-family: Arial;
-  background:#f4f6fa;
-  padding:20px;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    background: linear-gradient(135deg, #e3f2fd, #ede7f6);
+    padding: 20px;
 }
-h1 { text-align:center; }
+
+h1 { 
+    text-align:center; 
+    color: #4a6fa5;
+}
 
 input, select, textarea, button {
-  width:100%;
-  padding:10px;
-  margin:5px 0;
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-family: 'Poppins', sans-serif;
 }
+
+textarea { resize: none; }
 
 .card {
-  background:white;
-  padding:15px;
-  margin:10px 0;
-  border-radius:10px;
-  box-shadow:0 5px 15px rgba(0,0,0,.1);
+    background: white;
+    padding: 20px;
+    margin: 15px 0;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
 }
 
+.card:hover { transform: translateY(-5px); }
+
 .card img {
-  width:150px;
-  margin-top:5px;
-  border-radius:5px;
+    width: 100%;
+    max-width: 220px;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+h2 {
+    color: #4a6fa5;
+    margin-top: 30px;
 }
 
 .btn {
-  padding:8px;
-  margin:5px;
-  border:none;
-  cursor:pointer;
-  border-radius:5px;
+    padding: 12px;
+    margin: 5px 0;
+    border: none;
+    cursor: pointer;
+    border-radius: 30px;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
 }
 
-.btn-edit { background:#2196F3; color:white; }
-.btn-delete { background:#f44336; color:white; }
-.btn-save { background:#4CAF50; color:white; }
+.btn-save { 
+    background: linear-gradient(90deg, #8a2be2, #4a6fa5); 
+    color: white; 
+}
+.btn-save:hover { background: linear-gradient(90deg, #4a6fa5, #8a2be2); }
+
+.btn-edit { 
+    background: #2196F3; 
+    color: white; 
+}
+.btn-delete { 
+    background: #f44336; 
+    color: white; 
+}
+
+.form-section {
+    max-width: 400px;
+    margin: 0 auto 30px auto;
+}
 </style>
 </head>
 <body>
@@ -50,13 +89,13 @@ input, select, textarea, button {
 <script>
 // Verificar acceso admin
 if (localStorage.getItem("adminLogueado") !== "true") {
-  window.location.href = "admin.html";
+    window.location.href = "admin.html";
 }
 </script>
 
 <h1>🐾 Gestión de Mascotas</h1>
 
-<div class="card">
+<div class="card form-section">
   <h3>Agregar / Editar Mascota</h3>
 
   <input id="nombre" placeholder="Nombre">
@@ -86,83 +125,82 @@ let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
 let editId = null;
 
 function render() {
-  const lista = document.getElementById("lista");
-  lista.innerHTML = "";
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
 
-  mascotas.forEach(m => {
-    lista.innerHTML += `
-      <div class="card">
-        <b>${m.nombre}</b> (${m.tipo})<br>
-        ${m.raza} • ${m.edad} años • ${m.sexo}<br>
-        <small>${m.descripcion}</small><br>
-        ${m.imagen ? `<img src="${m.imagen}" alt="${m.nombre}">` : ""}
-        <button class="btn btn-edit" onclick="editar(${m.id})">✏️ Editar</button>
-        <button class="btn btn-delete" onclick="eliminar(${m.id})">🗑️ Eliminar</button>
-      </div>
-    `;
-  });
+    mascotas.forEach(m => {
+        lista.innerHTML += `
+        <div class="card">
+            <b>${m.nombre}</b> (${m.tipo})<br>
+            Raza: ${m.raza || 'No especificada'} • Edad: ${m.edad || '?'} años • Sexo: ${m.sexo || 'No especificado'}<br>
+            <small>${m.descripcion || ''}</small><br>
+            ${m.imagen ? `<img src="${m.imagen}" alt="${m.nombre}">` : ""}
+            <button class="btn btn-edit" onclick="editar(${m.id})">✏️ Editar</button>
+            <button class="btn btn-delete" onclick="eliminar(${m.id})">🗑️ Eliminar</button>
+        </div>
+        `;
+    });
 }
 
 function guardar(){
-  // Validar campos obligatorios
-  if(!nombre.value || !tipo.value || !edad.value){
-    alert("Por favor completa los campos Nombre, Tipo y Edad");
-    return;
-  }
+    if(!nombre.value || !tipo.value || !edad.value){
+        alert("Por favor completa los campos Nombre, Tipo y Edad");
+        return;
+    }
 
-  const mascota = {
-    id: editId || Date.now(),
-    nombre: nombre.value,
-    tipo: tipo.value,
-    raza: raza.value,
-    edad: edad.value,
-    sexo: sexo.value,
-    descripcion: descripcion.value,
-    imagen: imagen.value,
-    disponible: true
-  };
+    const mascota = {
+        id: editId || Date.now(),
+        nombre: nombre.value,
+        tipo: tipo.value,
+        raza: raza.value,
+        edad: edad.value,
+        sexo: sexo.value,
+        descripcion: descripcion.value,
+        imagen: imagen.value,
+        disponible: true
+    };
 
-  if (editId) {
-    const i = mascotas.findIndex(m => m.id === editId);
-    mascotas[i] = mascota;
-    editId = null;
-  } else {
-    mascotas.push(mascota);
-  }
+    if(editId){
+        const i = mascotas.findIndex(m => m.id === editId);
+        mascotas[i] = mascota;
+        editId = null;
+    } else {
+        mascotas.push(mascota);
+    }
 
-  localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
-  limpiar();
-  render();
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    limpiar();
+    render();
 }
 
 function editar(id){
-  const m = mascotas.find(x => x.id === id);
-  editId = id;
+    const m = mascotas.find(x => x.id === id);
+    editId = id;
 
-  nombre.value = m.nombre;
-  tipo.value = m.tipo;
-  raza.value = m.raza;
-  edad.value = m.edad;
-  sexo.value = m.sexo;
-  descripcion.value = m.descripcion;
-  imagen.value = m.imagen;
+    nombre.value = m.nombre;
+    tipo.value = m.tipo;
+    raza.value = m.raza;
+    edad.value = m.edad;
+    sexo.value = m.sexo;
+    descripcion.value = m.descripcion;
+    imagen.value = m.imagen;
 }
 
 function eliminar(id){
-  if (!confirm("¿Eliminar esta mascota?")) return;
-  mascotas = mascotas.filter(m => m.id !== id);
-  localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
-  render();
+    if(!confirm("¿Eliminar esta mascota?")) return;
+    mascotas = mascotas.filter(m => m.id !== id);
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    render();
 }
 
 function limpiar(){
-  nombre.value = "";
-  tipo.value = "";
-  raza.value = "";
-  edad.value = "";
-  sexo.value = "";
-  descripcion.value = "";
-  imagen.value = "";
+    nombre.value = "";
+    tipo.value = "";
+    raza.value = "";
+    edad.value = "";
+    sexo.value = "";
+    descripcion.value = "";
+    imagen.value = "";
 }
 
 render();
