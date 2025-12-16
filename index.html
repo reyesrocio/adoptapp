@@ -90,11 +90,11 @@ header p { margin: 5px 0 0; font-size: 16px; font-weight: 400; }
 
 <!-- Firebase -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-  // Configuración de Firebase
-  const firebaseConfig = {
+// Config Firebase
+const firebaseConfig = {
     apiKey: "AIzaSyAXP2jqSlxlgaZJR1EyDAJ7DcOxUIdZDrA",
     authDomain: "adoptapp-b18a9.firebaseapp.com",
     projectId: "adoptapp-b18a9",
@@ -102,36 +102,29 @@ header p { margin: 5px 0 0; font-size: 16px; font-weight: 400; }
     messagingSenderId: "137872497714",
     appId: "1:137872497714:web:00b7b3ea5b863ae6f6b02b",
     measurementId: "G-WM6T47K2BD"
-  };
+};
 
-  // Inicializar Firebase
-  const app = initializeApp(firebaseConfig);
-  const database = getDatabase(app);
-  const mascotasRef = ref(database, 'mascotas');
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const mascotasRef = ref(database, 'mascotas');
 
-  const contenedor = document.getElementById("lista-mascotas");
+const contenedor = document.getElementById("lista-mascotas");
 
-  // Renderizar mascotas en tiempo real
-  onValue(mascotasRef, (snapshot) => {
+// Datos locales de prueba por si Firebase no tiene info
+let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [
+    {id:1, nombre:"Gato Manul", tipo:"Gato", raza:"Manul", sexo:"Hembra", edad:"3", imagen:"https://cdn0.expertoanimal.com/es/posts/9/8/4/gato_manul_o_gato_de_pallas_caracteristicas_tipos_y_habitat_25489_orig.jpg", disponible:true, solicitado:false},
+    {id:2, nombre:"Fido", tipo:"Perro", raza:"Labrador", sexo:"Macho", edad:"2", imagen:"https://placedog.net/400/300", disponible:true, solicitado:false}
+];
+
+function renderMascotas(dataSource = mascotas){
     contenedor.innerHTML = "";
-    const data = snapshot.val();
-    if(!data) return;
-
-    Object.keys(data).forEach(id => {
-        const m = data[id];
-
-        // ---------------------------
-        // Lógica de estado
-        let estado = "Disponible"; // default
-        if (m.solicitudes && Object.keys(m.solicitudes).length > 0 && m.disponible) {
-            estado = "Analizando";
-        } else if (!m.disponible) {
-            estado = "Adoptado";
-        }
-        // ---------------------------
-
+    dataSource.forEach(m => {
         const div = document.createElement("div");
         div.classList.add("mascota");
+
+        // Estado: Analizando si hay solicitud, Adoptado si no disponible
+        let estado = m.disponible ? (m.solicitado ? "Analizando" : "Disponible") : "Adoptado";
+
         div.innerHTML = `
             <img src="${m.imagen || 'https://via.placeholder.com/220x180?text=Sin+Imagen'}" alt="${m.nombre}">
             <h3>${m.nombre}</h3>
@@ -140,24 +133,32 @@ header p { margin: 5px 0 0; font-size: 16px; font-weight: 400; }
             <p>Sexo: ${m.sexo || 'No especificado'}</p>
             <p>Edad: ${m.edad || 'No especificada'}</p>
             <p>Estado: ${estado}</p>
-            ${estado === "Disponible" ? `<button onclick="location.href='03-formulario_adopcion.html?id=${id}'">Adoptar</button>` : ''}
+            ${estado === "Disponible" ? `<button onclick="location.href='03-formulario_adopcion.html?id=${m.id}'">Adoptar</button>` : ''}
         `;
         contenedor.appendChild(div);
     });
+}
+
+// Render inicial local
+renderMascotas();
+
+// Firebase en tiempo real
+onValue(mascotasRef, (snapshot) => {
+    const data = snapshot.val();
+    if(!data) return;
+    const arrayMascotas = Object.keys(data).map(id => ({id, ...data[id]}));
+    renderMascotas(arrayMascotas);
 });
 
-  // Botón admin
-  document.getElementById("adminBtn").addEventListener("click", function() {
-      const pass = prompt("Ingrese contraseña de administrador:");
-      if (pass === "1234") {
-          localStorage.setItem("adminLogueado", "true");
-          window.location.href = "admin-mascotas.html";
-      } else {
-          alert("Contraseña incorrecta");
-      }
-  });
+// Botón admin
+document.getElementById("adminBtn").addEventListener("click", function() {
+    const pass = prompt("Ingrese contraseña de administrador:");
+    if (pass === "1234") {
+        localStorage.setItem("adminLogueado","true");
+        window.location.href="admin-mascotas.html";
+    } else alert("Contraseña incorrecta");
+});
 </script>
 
 </body>
 </html>
-
