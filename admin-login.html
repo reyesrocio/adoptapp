@@ -53,21 +53,20 @@
 </div>
 
 <script>
-function login() {
-  const password = document.getElementById("pass").value;
-
-  if (password.trim() === "1234") {
-    localStorage.setItem("adminLogueado", "true");
-    window.location.href = "admin-panel.html";
-  } else {
-    document.getElementById("msg").innerText = "❌ Contraseña incorrecta";
-  }
-}
-</script>
-
-  // Si el admin ya está logueado, no necesita poner la contraseña
+  // Verifica si ya está logueado
   if (localStorage.getItem("adminLogueado") === "true") {
-    window.location.href = "admin-panel.html";  // Si está logueado, redirige directamente
+    window.location.href = "admin-panel.html";  // Si está logueado, redirige automáticamente
+  }
+
+  function login() {
+    const password = document.getElementById("pass").value;
+
+    if (password.trim() === "1234") {
+      localStorage.setItem("adminLogueado", "true");
+      window.location.href = "admin-panel.html";  // Redirige al panel de administración
+    } else {
+      document.getElementById("msg").innerText = "❌ Contraseña incorrecta";  // Mensaje de error
+    }
   }
 </script>
 
