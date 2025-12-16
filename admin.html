@@ -80,14 +80,14 @@
 </div>
 
 <script>
-    const PASSWORD_ADMIN = "admin123";
+    const PASSWORD_ADMIN = "1234";
 
     function login() {
         const pass = document.getElementById("password").value;
 
         if (pass === PASSWORD_ADMIN) {
             localStorage.setItem("adminLogueado", "true");
-            window.location.href = "admin_panel.html";
+            window.location.href = "admin-panel.html";
         } else {
             document.getElementById("error").style.display = "block";
         }
