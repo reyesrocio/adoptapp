@@ -26,6 +26,12 @@ input, select, textarea, button {
   box-shadow:0 5px 15px rgba(0,0,0,.1);
 }
 
+.card img {
+  width:150px;
+  margin-top:5px;
+  border-radius:5px;
+}
+
 .btn {
   padding:8px;
   margin:5px;
@@ -42,6 +48,7 @@ input, select, textarea, button {
 <body>
 
 <script>
+// Verificar acceso admin
 if (localStorage.getItem("adminLogueado") !== "true") {
   window.location.href = "admin.html";
 }
@@ -88,7 +95,7 @@ function render() {
         <b>${m.nombre}</b> (${m.tipo})<br>
         ${m.raza} • ${m.edad} años • ${m.sexo}<br>
         <small>${m.descripcion}</small><br>
-
+        ${m.imagen ? `<img src="${m.imagen}" alt="${m.nombre}">` : ""}
         <button class="btn btn-edit" onclick="editar(${m.id})">✏️ Editar</button>
         <button class="btn btn-delete" onclick="eliminar(${m.id})">🗑️ Eliminar</button>
       </div>
@@ -97,6 +104,12 @@ function render() {
 }
 
 function guardar(){
+  // Validar campos obligatorios
+  if(!nombre.value || !tipo.value || !edad.value){
+    alert("Por favor completa los campos Nombre, Tipo y Edad");
+    return;
+  }
+
   const mascota = {
     id: editId || Date.now(),
     nombre: nombre.value,
@@ -105,7 +118,7 @@ function guardar(){
     edad: edad.value,
     sexo: sexo.value,
     descripcion: descripcion.value,
-    imagen: fotoInput.value,
+    imagen: imagen.value,
     disponible: true
   };
 
