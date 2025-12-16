@@ -6,26 +6,52 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
         h1 { text-align: center; color: #333; }
-        .mascota { border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 10px; background-color: #fff; }
-        .mascota img { max-width: 200px; display: block; margin-bottom: 10px; border-radius: 10px; }
-        form { margin-top: 10px; }
-        label { display: block; margin-top: 5px; }
-        input, button { padding: 8px; margin-top: 5px; width: 100%; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #4a6fa5; color: white; border: none; cursor: pointer; }
+        .mascota { 
+            border: 1px solid #ccc; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 10px; 
+            background-color: #fff; 
+            display: inline-block;
+            width: 250px;
+            vertical-align: top;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .mascota img { max-width: 200px; border-radius: 10px; }
+        button { 
+            margin-top: 10px;
+            padding: 10px;
+            width: 90%;
+            border-radius: 5px; 
+            border: none; 
+            background-color: #4a6fa5; 
+            color: white; 
+            cursor: pointer; 
+        }
         button:hover { background-color: #3b5480; }
     </style>
 </head>
 <body>
     <h1>Mascotas Disponibles para Adopción</h1>
-    <div id="lista-mascotas">
-        <!-- Se cargarán las mascotas aquí -->
-    </div>
+    <div id="lista-mascotas"></div>
 
     <script>
-        // Cargar mascotas desde localStorage (o usar ejemplo si está vacío)
-        const mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [
-            {id: 1, nombre: "Fido", especie: "Perro", edad: "2 años", foto: "fido.jpg"},
-            {id: 2, nombre: "Misu", especie: "Gato", edad: "1 año", foto: "misu.jpg"}
+        const mascotas = [
+            {
+                id: 1,
+                nombre: "Gato Manul",
+                especie: "Gato",
+                edad: "3 años",
+                foto: "https://cdn0.expertoanimal.com/es/posts/9/8/4/gato_manul_o_gato_de_pallas_caracteristicas_tipos_y_habitat_25489_orig.jpg"
+            },
+            {
+                id: 2,
+                nombre: "Fido",
+                especie: "Perro",
+                edad: "2 años",
+                foto: "https://placedog.net/400/300"
+            }
         ];
 
         const contenedor = document.getElementById("lista-mascotas");
@@ -34,46 +60,13 @@
             const div = document.createElement("div");
             div.classList.add("mascota");
             div.innerHTML = `
-                <h2>${mascota.nombre} (${mascota.especie})</h2>
-                <p>Edad: ${mascota.edad}</p>
+                <h2>${mascota.nombre}</h2>
+                <p>${mascota.especie} | Edad: ${mascota.edad}</p>
                 <img src="${mascota.foto}" alt="${mascota.nombre}">
-
-                <h3>Formulario de Solicitud de Adopción</h3>
-                <form onsubmit="enviarSolicitud(event, ${mascota.id})">
-                    <label>Nombre:</label>
-                    <input type="text" name="nombre" placeholder="Tu nombre" required>
-
-                    <label>Teléfono:</label>
-                    <input type="tel" name="telefono" placeholder="Tu teléfono" required>
-
-                    <label>Correo:</label>
-                    <input type="email" name="correo" placeholder="Tu correo" required>
-
-                    <button type="submit">Enviar Solicitud</button>
-                </form>
+                <button onclick="location.href='formulario-adopcion.html?id=${mascota.id}'">Adoptar</button>
             `;
             contenedor.appendChild(div);
         });
-
-        function enviarSolicitud(event, idMascota) {
-            event.preventDefault();
-            const form = event.target;
-            const solicitud = {
-                mascotaId: idMascota,
-                nombre: form.nombre.value,
-                telefono: form.telefono.value,
-                correo: form.correo.value,
-                fecha: new Date().toLocaleDateString()
-            };
-
-            // Guardar solicitud en localStorage
-            const solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
-            solicitudes.push(solicitud);
-            localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
-
-            alert("¡Solicitud enviada con éxito!");
-            form.reset();
-        }
     </script>
 </body>
 </html>
