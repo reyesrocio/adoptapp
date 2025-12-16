@@ -2,150 +2,206 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Panel Admin | ADOPTAPP</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<title>Admin | Gestión de Mascotas</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 body {
     font-family: 'Poppins', sans-serif;
-    background: #f4f6fb;
-    padding: 30px;
-}
-
-h1 {
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.menu {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.menu a, .menu button {
-    display: inline-block;
-    margin: 10px;
-    padding: 12px 20px;
-    border-radius: 25px;
-    border: none;
-    text-decoration: none;
-    font-weight: 600;
-    color: white;
-    cursor: pointer;
-}
-
-.mascotas { background: #2196F3; }
-.logout { background: #f44336; }
-
-.card {
-    background: white;
+    background: linear-gradient(135deg, #e3f2fd, #ede7f6);
+    margin: 0;
     padding: 20px;
+}
+h1 { text-align: center; color: #4a6fa5; margin-bottom: 20px; }
+.form-card, .card {
+    background: white;
     border-radius: 15px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    margin-bottom: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
-
-.btn {
-    padding: 8px 14px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    color: white;
+input, select, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+}
+button {
     cursor: pointer;
-    margin-right: 10px;
-}
-
-.aprobar { background: #4CAF50; }
-.rechazar { background: #ff5252; }
-
-.estado {
     font-weight: bold;
+    border: none;
+    transition: background 0.3s;
+}
+.btn-save { background: linear-gradient(90deg, #8a2be2, #4a6fa5); color: white; }
+.btn-save:hover { background: linear-gradient(90deg, #4a6fa5, #8a2be2); }
+.btn-edit { background: #2196F3; color: white; }
+.btn-delete { background: #f44336; color: white; }
+.btn-adopt { background: #4CAF50; color: white; margin-top: 5px; }
+.card img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 10px;
+    display: block;
+    margin: 10px auto;
+}
+h3 { color: #4a6fa5; margin-bottom: 10px; text-align:center; }
+.solicitudes {
+    margin-top: 10px;
+    background: #f4f6fa;
+    padding: 10px;
+    border-radius: 10px;
+}
+.solicitud {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    font-size: 14px;
 }
 </style>
 </head>
-
 <body>
 
-<script>
-if (localStorage.getItem("adminLogueado") !== "true") {
-    window.location.href = "admin.html";
-}
-</script>
+<h1>🐾 Gestión de Mascotas</h1>
 
-<h1>👑 Panel Administrador</h1>
-<p style="text-align:center;">Gestión de solicitudes de adopción</p>
-
-<div class="menu">
-    <a href="admin-mascotas.html" class="mascotas">🐶 Gestionar Mascotas</a>
-    <button class="logout" onclick="logout()">🚪 Cerrar sesión</button>
+<div class="form-card">
+    <h3>Agregar / Editar Mascota</h3>
+    <input id="nombre" placeholder="Nombre">
+    <select id="tipo">
+        <option value="">Tipo</option>
+        <option>Perro</option>
+        <option>Gato</option>
+    </select>
+    <input id="raza" placeholder="Raza">
+    <input id="edad" type="number" placeholder="Edad">
+    <select id="sexo">
+        <option value="">Sexo</option>
+        <option>Macho</option>
+        <option>Hembra</option>
+    </select>
+    <textarea id="descripcion" placeholder="Descripción"></textarea>
+    <input id="imagen" placeholder="URL de imagen">
+    <button class="btn-save" onclick="guardar()">💾 Guardar</button>
 </div>
 
-<h2>📋 Solicitudes Pendientes</h2>
-
-<div id="listaSolicitudes"></div>
+<h2>📋 Mascotas Registradas</h2>
+<div id="lista"></div>
 
 <script>
-function logout() {
-    localStorage.removeItem("adminLogueado");
-    window.location.href = "index.html";
-}
-
-let solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
 let mascotas = JSON.parse(localStorage.getItem("mascotasDB")) || [];
+let solicitudes = JSON.parse(localStorage.getItem("solicitudesDB")) || [];
+let editId = null;
 
-const contenedor = document.getElementById("listaSolicitudes");
+function render() {
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
 
-function renderSolicitudes() {
-    contenedor.innerHTML = "";
-
-    if (solicitudes.length === 0) {
-        contenedor.innerHTML = "<p>No hay solicitudes registradas.</p>";
-        return;
-    }
-
-    solicitudes.forEach((s, index) => {
-        const div = document.createElement("div");
-        div.className = "card";
-
-        div.innerHTML = `
-            <p><strong>Mascota:</strong> ${s.mascotaNombre}</p>
-            <p><strong>Adoptante:</strong> ${s.adoptante}</p>
-            <p><strong>Teléfono:</strong> ${s.telefono}</p>
-            <p class="estado">Estado: ${s.estado}</p>
-            ${
-                s.estado === "pendiente"
-                ? `<button class="btn aprobar" onclick="aprobar(${index})">Aceptar</button>
-                   <button class="btn rechazar" onclick="rechazar(${index})">Rechazar</button>`
-                : ""
-            }
+    mascotas.forEach(m => {
+        let html = `
+        <div class="card">
+            <h3>${m.nombre}</h3>
+            <img src="${m.imagen || 'https://via.placeholder.com/120'}" alt="${m.nombre}">
+            <p><b>Tipo:</b> ${m.tipo || 'No especificado'}</p>
+            <p><b>Raza:</b> ${m.raza || 'No especificada'}</p>
+            <p><b>Edad:</b> ${m.edad || 'No especificada'} años</p>
+            <p><b>Sexo:</b> ${m.sexo || 'No especificado'}</p>
+            <p>${m.descripcion || ''}</p>
+            <button class="btn-edit" onclick="editar(${m.id})">✏️ Editar</button>
+            <button class="btn-delete" onclick="eliminar(${m.id})">🗑️ Eliminar</button>
+            <div class="solicitudes"><b>Solicitudes:</b>
         `;
 
-        contenedor.appendChild(div);
+        const mSolicitudes = solicitudes.filter(s => s.mascotaId == m.id);
+        if (mSolicitudes.length === 0) {
+            html += `<div class="solicitud">Analizando... (sin solicitudes)</div>`;
+        } else {
+            mSolicitudes.forEach(s => {
+                html += `<div class="solicitud">
+                            ${s.nombre} - DNI: ${s.dni} - Tel: ${s.telefono} - Email: ${s.correo} - Fecha: ${s.fecha}
+                            <button class="btn-adopt" onclick="marcarAdoptado(${m.id})">✅ Marcar como Adoptado</button>
+                         </div>`;
+            });
+        }
+        html += "</div></div>";
+        lista.innerHTML += html;
     });
 }
 
-function aprobar(i) {
-    const solicitud = solicitudes[i];
-
-    const idxMascota = mascotas.findIndex(m => m.id === solicitud.mascotaId);
-    if (idxMascota !== -1) {
-        mascotas[idxMascota].disponible = false;
-        localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+function guardar() {
+    if(!nombre.value || !tipo.value || !edad.value){
+        alert("Completa Nombre, Tipo y Edad");
+        return;
     }
 
-    solicitudes[i].estado = "aprobada";
-    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
-    renderSolicitudes();
+    const id = editId || Date.now();
+    const mascota = {
+        id: id,
+        nombre: nombre.value,
+        tipo: tipo.value,
+        raza: raza.value,
+        edad: edad.value,
+        sexo: sexo.value,
+        descripcion: descripcion.value,
+        imagen: imagen.value,
+        disponible: true
+    };
+
+    if(editId){ // editar existente
+        const index = mascotas.findIndex(m => m.id === editId);
+        mascotas[index] = mascota;
+    } else { // agregar nueva
+        mascotas.push(mascota);
+    }
+
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    alert("Mascota guardada ✅");
+    limpiar();
+    editId = null;
+    render();
 }
 
-function rechazar(i) {
-    solicitudes[i].estado = "rechazada";
-    localStorage.setItem("solicitudesDB", JSON.stringify(solicitudes));
-    renderSolicitudes();
+function editar(id){
+    const m = mascotas.find(x => x.id === id);
+    editId = id;
+    nombre.value = m.nombre;
+    tipo.value = m.tipo;
+    raza.value = m.raza;
+    edad.value = m.edad;
+    sexo.value = m.sexo;
+    descripcion.value = m.descripcion;
+    imagen.value = m.imagen;
 }
 
-renderSolicitudes();
+function eliminar(id){
+    if (!confirm("¿Eliminar esta mascota?")) return;
+    mascotas = mascotas.filter(m => m.id !== id);
+    localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+    render();
+}
+
+function limpiar(){
+    nombre.value = "";
+    tipo.value = "";
+    raza.value = "";
+    edad.value = "";
+    sexo.value = "";
+    descripcion.value = "";
+    imagen.value = "";
+}
+
+function marcarAdoptado(id){
+    const i = mascotas.findIndex(m => m.id === id);
+    if(i >= 0){
+        mascotas[i].disponible = false;
+        localStorage.setItem("mascotasDB", JSON.stringify(mascotas));
+        alert("Mascota marcada como adoptada ✅");
+        render();
+    }
+}
+
+render();
 </script>
 
 </body>
