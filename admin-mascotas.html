@@ -147,17 +147,17 @@ function render() {
 
         const mSolicitudes = solicitudes.filter(s => s.mascotaId == m.id);
         if (mSolicitudes.length === 0) {
-          html += `<div class="solicitud">Analizando... (sin solicitudes)</div>`;
+            html += `<div class="solicitud">Analizando... (sin solicitudes)</div>`;
         } else {
-          mSolicitudes.forEach((s, idx) => {
-            html += `<div class="solicitud">
-                    ${s.nombre} - DNI: ${s.dni} - Tel: ${s.telefono} - Email: ${s.correo} - Fecha: ${s.fecha}
-                    ${s.estado !== "rechazada" && s.estado !== "aprobada" 
-                        ? `<button class="btn-adopt" onclick="marcarAdoptado(${m.id}, ${idx})">✅ Marcar como Adoptado</button>
-                           <button class="btn-delete" onclick="rechazarSolicitud(${m.id}, ${idx})">❌ Rechazar</button>`
-                        : `<span style="color:${s.estado==="aprobada"?"green":"red"};">${s.estado.toUpperCase()}</span>`
-                    }
-                 </div>`;
+            mSolicitudes.forEach(s => {
+                html += `<div class="solicitud">
+                            ${s.nombre} - DNI: ${s.dni} - Tel: ${s.telefono} - Email: ${s.correo} - Fecha: ${s.fecha}
+                            <button class="btn-adopt" onclick="marcarAdoptado(${m.id})">✅ Marcar como Adoptado</button>
+                         </div>`;
+            });
+        }
+        html += "</div></div>";
+        lista.innerHTML += html;
     });
 }
 
