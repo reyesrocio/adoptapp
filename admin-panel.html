@@ -108,8 +108,14 @@ function renderSolicitudes() {
         const div = document.createElement("div");
         div.className = "card";
 
+        // Buscamos la mascota para obtener su foto
+        const mascota = mascotas.find(m => m.id === s.mascotaId);
+
         div.innerHTML = `
-            <p><strong>Mascota:</strong> ${s.mascotaNombre}</p>
+            <h3>${mascota ? mascota.nombre : s.mascotaNombre}</h3>
+            <img src="${mascota && mascota.imagen ? mascota.imagen : 'https://via.placeholder.com/120'}" 
+                 alt="${mascota ? mascota.nombre : s.mascotaNombre}" 
+                 style="width:120px; height:120px; object-fit:cover; display:block; margin:10px auto; border-radius:10px;">
             <p><strong>Adoptante:</strong> ${s.adoptante}</p>
             <p><strong>Teléfono:</strong> ${s.telefono}</p>
             <p class="estado">Estado: ${s.estado}</p>
@@ -121,9 +127,9 @@ function renderSolicitudes() {
             }
         `;
 
-        contenedor.appendChild(div);
-    });
-}
+    contenedor.appendChild(div);
+});
+
 
 function aprobar(i) {
     const solicitud = solicitudes[i];
